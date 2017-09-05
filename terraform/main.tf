@@ -1,6 +1,7 @@
 provider "aws" {
   region = "${var.region}"
   profile = "${var.profile}"
+
 }
 
 resource "aws_spot_instance_request" "worker01" {
