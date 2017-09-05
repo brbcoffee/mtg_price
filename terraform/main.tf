@@ -4,8 +4,8 @@ provider "aws" {
 
 }
 
-resource "aws_spot_instance_request" "worker01" {
-  ami           = "ami-0cb95574"
+resource "aws_spot_instance_request" "mtg_worker01" {
+  ami           = "ami-e1679399"
   spot_price    = "0.02"
   instance_type = "m3.medium"
   vpc_security_group_ids = [ "${aws_security_group.ssh_access.id}", "${aws_security_group.tcp_internal_access.id}","${aws_security_group.splunk_access.id}","${aws_security_group.internet_access.id}" ]
@@ -25,10 +25,22 @@ resource "aws_spot_instance_request" "worker01" {
       source = "~/.ssh/my_github"
       destination = "~/.ssh/my_github"
   }
+  provisioner "file" {
+      source = "provisioners/config"
+      destination = "~/.ssh/config"
+  }
+  provisioner "file" {
+      source = "provisioners/clone_mtg_work.sh"
+      destination = "~/clone_mtg_work.sh"
+  }
   provisioner "remote-exec" {
 
     inline = [
-      "touch foo",
+      "chmod 600 ~/.ssh/config",
+      "chmod 400 ~/.ssh/my_github",
+      "chmod +x ~/clone_mtg_work.sh",
+      "./clone_mtg_work.sh",
+#      "git clone work",
     ]
   }
 }
